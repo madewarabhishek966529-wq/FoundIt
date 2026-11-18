@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Filter, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, RotateCcw, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
 import { getItems } from '../api/items.api';
 import { ItemCard } from '../components/items/ItemCard';
 import { CategoryChips } from '../components/ui/CategoryChips';
 import { ZoneSelect } from '../components/ui/ZoneSelect';
 import { SkeletonCard } from '../components/ui/SkeletonCard';
 import { EmptyState } from '../components/ui/EmptyState';
+import { SearchByImageModal } from '../components/ui/SearchByImageModal';
 
 export const Browse = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [imageModalOpen, setImageModalOpen] = useState(false);
 
   const type = searchParams.get('type') || '';
   const category = searchParams.get('category') || '';
@@ -60,6 +62,11 @@ export const Browse = () => {
 
   return (
     <div className="space-y-6">
+      <SearchByImageModal
+        isOpen={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+      />
+
       {/* Top Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -111,17 +118,29 @@ export const Browse = () => {
             </button>
           </div>
 
-          {/* Search Input */}
-          <form onSubmit={handleSearchSubmit} className="relative flex-1 sm:max-w-xs">
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search keyword..."
-              className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-          </form>
+          {/* Search Input and Visual Search Button */}
+          <div className="flex items-center gap-2 flex-1 sm:max-w-md">
+            <form onSubmit={handleSearchSubmit} className="relative flex-1">
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search keyword..."
+                className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            </form>
+
+            <button
+              type="button"
+              onClick={() => setImageModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900 rounded-xl text-xs font-bold hover:bg-blue-100 transition-colors shrink-0"
+              title="Search by Photo"
+            >
+              <Camera className="w-4 h-4" />
+              <span className="hidden sm:inline">Photo Search</span>
+            </button>
+          </div>
         </div>
 
         {/* Zone & Clear */}

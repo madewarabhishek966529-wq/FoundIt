@@ -13,12 +13,16 @@ import {
   HelpCircle,
   Clock,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  RotateCcw,
+  Loader2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { getItemById, deleteItem } from '../api/items.api';
+import { getItemMatches, dismissMatch } from '../api/matches.api';
 import { useAuthStore } from '../store/authStore';
 import { StatusBadge } from '../components/ui/StatusBadge';
+import { MatchCard } from '../components/matches/MatchCard';
 
 export const ItemDetail = () => {
   const { id } = useParams();
@@ -27,11 +31,32 @@ export const ItemDetail = () => {
   const { user } = useAuthStore();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const { data, isLoading, error } = useQuery({
+  // Fetch item details
+  const { data: itemData, isLoading: itemLoading, error } = useQuery({
     queryKey: ['item', id],
     queryFn: () => getItemById(id)
   });
 
+  const item = itemData?.data?.item;
+  const isOwner = user && item?.reporter && item?.reporter.id === user.id;
+  const isAdmin = user && user.role === 'admin';
+
+  // Fetch matches if owner or admin
+  const { data: matchesData, isLoading: matchesLoading } = useQuery({
+    queryKey: ['matches', id],
+    queryFn: () => getItemMatches(id),
+    enabled: Boolean(isOwner || isAdmin),
+    refetchInterval: (query) => {
+      // Poll every 3 seconds if embedding is still pending
+      const status = query.state.data?.data?.embeddingStatus;
+      return status === 'pending' ? 3000 : false;
+    }
+  });
+
+  const matches = matchesData?.data?.matches || [];
+  const embeddingStatus = matchesData?.data?.embeddingStatus || item?.embeddingStatus;
+
+  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: () => deleteItem(id),
     onSuccess: () => {
@@ -40,7 +65,15 @@ export const ItemDetail = () => {
     }
   });
 
-  if (isLoading) {
+  // Dismiss match mutation
+  const dismissMutation = useMutation({
+    mutationFn: (matchId) => dismissMatch(matchId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['matches', id] });
+    }
+  });
+
+  if (itemLoading) {
     return (
       <div className="max-w-4xl mx-auto py-12 text-center text-slate-500">
         Loading item details...
@@ -48,7 +81,7 @@ export const ItemDetail = () => {
     );
   }
 
-  if (error || !data?.data?.item) {
+  if (error || !item) {
     return (
       <div className="max-w-xl mx-auto py-16 text-center space-y-4">
         <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Item not found</h2>
@@ -60,14 +93,12 @@ export const ItemDetail = () => {
     );
   }
 
-  const item = data.data.item;
-  const isOwner = user && item.reporter && item.reporter.id === user.id;
-  const isAdmin = user && user.role === 'admin';
   const isFound = item.type === 'found';
   const hasImages = item.images && item.images.length > 0;
 
   return (
-    <div className="max-w-5xl mx-auto py-4 space-y-6">
+    <div className="max-w-5xl mx-auto py-4 space-y-8">
+      {/* Top Bar */}
       <div className="flex items-center justify-between">
         <button
           type="button"
@@ -95,6 +126,7 @@ export const ItemDetail = () => {
         )}
       </div>
 
+      {/* Main Item Presentation Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         {/* Left Column: Photos Gallery */}
         <div className="space-y-4">
@@ -166,7 +198,7 @@ export const ItemDetail = () => {
               </p>
             )}
 
-            {/* Key Metadata Table */}
+            {/* Key Metadata Grid */}
             <div className="grid grid-cols-2 gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs">
               <div className="space-y-1">
                 <span className="text-slate-400">Campus Zone</span>
@@ -229,27 +261,76 @@ export const ItemDetail = () => {
             )}
           </div>
 
-          {/* Action button: Claim (Phase 3) or Match notification */}
+          {/* Action button: Claim (Phase 3) */}
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
             {isFound && !isOwner && item.status === 'open' && (
               <button
                 type="button"
-                onClick={() => alert('Claim flow with hidden detail verification is coming in Phase 3!')}
+                onClick={() => alert('Claim verification modal will be enabled in Phase 3!')}
                 className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>This is mine (Claim Item)</span>
               </button>
             )}
-
-            {isOwner && (
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 text-center text-xs text-slate-600 dark:text-slate-300">
-                You reported this item. Our neural matching engine automatically links it with opposite reports.
-              </div>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Owner Match Section (Phase 2 core) */}
+      {(isOwner || isAdmin) && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
+                  Ranked Matches ({matches.length})
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Computed via CLIP 512-dim visual and keyword embeddings
+                </p>
+              </div>
+            </div>
+
+            {embeddingStatus === 'pending' && (
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-semibold animate-pulse">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Generating Vector Embedding...</span>
+              </div>
+            )}
+          </div>
+
+          {matchesLoading ? (
+            <div className="py-8 text-center text-xs text-slate-500">
+              Loading match suggestions...
+            </div>
+          ) : matches.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {matches.map((match) => (
+                <MatchCard
+                  key={match._id || match.id}
+                  match={match}
+                  currentItemType={item.type}
+                  onDismiss={(matchId) => dismissMutation.mutate(matchId)}
+                  onClaim={() => alert('Claim flow will be enabled in Phase 3!')}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
+              <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                No matching {isFound ? 'lost' : 'found'} items found yet
+              </p>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Our matching pipeline automatically scores and links new opposite reports as they are submitted on campus.
+              </p>
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 };

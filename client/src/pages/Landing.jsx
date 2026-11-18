@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -9,13 +9,17 @@ import {
   ArrowRight,
   HelpCircle,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Camera
 } from 'lucide-react';
 import { getItems } from '../api/items.api';
 import { ItemCard } from '../components/items/ItemCard';
 import { SkeletonCard } from '../components/ui/SkeletonCard';
+import { SearchByImageModal } from '../components/ui/SearchByImageModal';
 
 export const Landing = () => {
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+
   const { data, isLoading } = useQuery({
     queryKey: ['items', 'recent-found'],
     queryFn: () => getItems({ type: 'found', limit: 4, sort: 'newest' })
@@ -25,6 +29,12 @@ export const Landing = () => {
 
   return (
     <div className="space-y-16 py-6">
+      {/* Search by Image Modal */}
+      <SearchByImageModal
+        isOpen={imageModalOpen}
+        onClose={() => setImageModalOpen(false)}
+      />
+
       {/* Hero Section */}
       <section className="relative text-center max-w-3xl mx-auto space-y-6 pt-6 pb-2">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-semibold shadow-sm">
@@ -56,6 +66,14 @@ export const Landing = () => {
             <CheckCircle2 className="w-5 h-5" />
             <span>I Found Something</span>
           </Link>
+          <button
+            type="button"
+            onClick={() => setImageModalOpen(true)}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 shadow-sm transition-all text-base"
+          >
+            <Camera className="w-5 h-5" />
+            <span>Search by Photo</span>
+          </button>
         </div>
 
         {/* Quick Search Shortcut */}
@@ -98,7 +116,7 @@ export const Landing = () => {
         </div>
 
         <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">Campus Security Desk Workflow</h3>

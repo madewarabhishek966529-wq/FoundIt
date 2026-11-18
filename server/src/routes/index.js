@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import itemRoutes from './item.routes.js';
+import matchRoutes from './match.routes.js';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.get('/health', (req, res) => {
 
 router.use('/auth', authRoutes);
 router.use('/items', itemRoutes);
+router.use('/matches', matchRoutes);
 
 export default router;

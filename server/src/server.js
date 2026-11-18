@@ -2,12 +2,18 @@ import http from 'http';
 import app from './app.js';
 import { env } from './config/env.js';
 import { connectDB } from './config/db.js';
+import { initializeCLIP } from './services/embedding.service.js';
 
 const server = http.createServer(app);
 
 const startServer = async () => {
   // Connect to MongoDB
   await connectDB();
+
+  // Warm up CLIP transformer model in background
+  initializeCLIP().catch((err) => {
+    console.warn('[CLIP] Warmup notice:', err.message);
+  });
 
   server.listen(env.PORT, () => {
     console.log(`===============================================`);

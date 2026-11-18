@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import { Item } from '../models/Item.js';
 import { ApiError } from '../utils/ApiError.js';
 import { env } from '../config/env.js';
+import { generateItemEmbedding } from './embedding.service.js';
+import { findMatchesForItem } from './matching.service.js';
 
 export const normalizeAnswer = (answer = '') => {
   return answer
@@ -13,6 +15,36 @@ export const normalizeAnswer = (answer = '') => {
 
 export const hashVerificationAnswer = (normalizedAnswer) => {
   return crypto.createHash('sha256').update(normalizedAnswer).digest('hex');
+};
+
+/**
+ * Async background worker to compute embedding and run matching
+ */
+export const processItemEmbeddingAsync = async (itemId, firstImageBuffer = null) => {
+  try {
+    const item = await Item.findById(itemId);
+    if (!item) return;
+
+    // Generate embeddings
+    const embeddings = await generateItemEmbedding(item, firstImageBuffer);
+
+    item.embedding = embeddings.embedding;
+    item.imageEmbedding = embeddings.imageEmbedding;
+    item.textEmbedding = embeddings.textEmbedding;
+    item.embeddingStatus = 'ready';
+    await item.save();
+
+    // Trigger candidate matching
+    const matches = await findMatchesForItem(item);
+    if (matches && matches.length > 0) {
+      item.status = 'matched';
+      await item.save();
+    }
+    console.log(`[Matching] Processed item ${itemId}, generated ${matches.length} matches.`);
+  } catch (err) {
+    console.error(`[Matching] Error processing embedding for item ${itemId}:`, err.message);
+    await Item.findByIdAndUpdate(itemId, { embeddingStatus: 'failed' }).catch(() => {});
+  }
 };
 
 export const createItem = async (data, files, userId) => {
