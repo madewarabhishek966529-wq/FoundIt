@@ -131,8 +131,7 @@ const itemSchema = new mongoose.Schema(
       select: false
     },
     expiresAt: {
-      type: Date,
-      index: true
+      type: Date
     }
   },
   {
