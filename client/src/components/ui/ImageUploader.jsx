@@ -20,6 +20,38 @@ export const ImageUploader = ({ files, onChange, maxFiles = 3, required = false 
         setWarning('Image file size must be less than 5MB.');
         continue;
       }
+
+      // Client-side image quality check (Brightness & Resolution)
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          if (img.width < 200 || img.height < 200) {
+            setWarning('Image resolution is very low. Clear photos improve neural matching accuracy.');
+            return;
+          }
+
+          // Offscreen canvas for luminosity check
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = 64;
+          canvas.height = 64;
+          ctx.drawImage(img, 0, 0, 64, 64);
+          const imageData = ctx.getImageData(0, 0, 64, 64);
+          const data = imageData.data;
+          let totalLuminance = 0;
+          for (let p = 0; p < data.length; p += 4) {
+            totalLuminance += 0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2];
+          }
+          const avgLuminance = totalLuminance / (64 * 64);
+          if (avgLuminance < 45) {
+            setWarning('This photo appears quite dark. Good lighting improves CLIP visual matching accuracy.');
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
       validFiles.push(file);
     }
 

@@ -20,10 +20,12 @@ import {
   completeHandover,
   getHandoverLogs
 } from '../api/admin.api';
+import { ItemQRCodeModal } from '../components/ui/ItemQRCodeModal';
 
 export const AdminDashboard = () => {
   const [tab, setTab] = useState('desk'); // 'desk', 'claims', 'logs'
   const [selectedClaimForHandover, setSelectedClaimForHandover] = useState(null);
+  const [qrModalItem, setQrModalItem] = useState(null);
   const [idChecked, setIdChecked] = useState(false);
   const [handoverNote, setHandoverNote] = useState('');
   const queryClient = useQueryClient();
@@ -84,6 +86,13 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-8">
+      {/* QR Code Tag Modal */}
+      <ItemQRCodeModal
+        isOpen={Boolean(qrModalItem)}
+        onClose={() => setQrModalItem(null)}
+        item={qrModalItem}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -199,6 +208,14 @@ export const AdminDashboard = () => {
                     <p className="text-xs text-slate-400 mt-1">
                       Found in: {item.zone}
                     </p>
+
+                    <button
+                      type="button"
+                      onClick={() => setQrModalItem(item)}
+                      className="mt-3 w-full py-1.5 border border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg text-xs font-semibold transition-colors"
+                    >
+                      Print Desk QR Tag
+                    </button>
                   </div>
                 </div>
               ))}

@@ -24,6 +24,7 @@ import { useAuthStore } from '../store/authStore';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { MatchCard } from '../components/matches/MatchCard';
 import { ClaimModal } from '../components/claims/ClaimModal';
+import { ItemQRCodeModal } from '../components/ui/ItemQRCodeModal';
 
 export const ItemDetail = () => {
   const { id } = useParams();
@@ -33,6 +34,7 @@ export const ItemDetail = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [activeClaimMatch, setActiveClaimMatch] = useState(null);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
 
   // Fetch item details
   const { data: itemData, isLoading: itemLoading, error } = useQuery({
@@ -116,6 +118,13 @@ export const ItemDetail = () => {
           queryClient.invalidateQueries({ queryKey: ['matches', id] });
           navigate('/claims');
         }}
+      />
+
+      {/* QR Code Modal */}
+      <ItemQRCodeModal
+        isOpen={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        item={item}
       />
 
       {/* Top Bar */}
@@ -261,11 +270,20 @@ export const ItemDetail = () => {
 
             {/* Security Desk Notice */}
             {item.heldAtDesk && (
-              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300 text-xs">
-                <ShieldCheck className="w-4 h-4 shrink-0" />
-                <span>
-                  <strong>Held at Security Desk:</strong> Verified owners can collect this item directly from campus security.
-                </span>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300 text-xs gap-3">
+                <div className="flex items-center gap-2.5">
+                  <ShieldCheck className="w-4 h-4 shrink-0" />
+                  <span>
+                    <strong>Held at Security Desk:</strong> Verified owners can collect this item directly from campus security.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setQrModalOpen(true)}
+                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[11px] shrink-0 transition-colors"
+                >
+                  View QR Tag
+                </button>
               </div>
             )}
 
