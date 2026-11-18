@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { logout as apiLogout } from '../../api/auth.api';
+import { NotificationBell } from './NotificationBell';
 
 export const Navbar = () => {
   const { user, clearAuth, theme, toggleTheme } = useAuthStore();
@@ -94,6 +95,16 @@ export const Navbar = () => {
                 >
                   My Reports
                 </Link>
+                <Link
+                  to="/claims"
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    isActive('/claims')
+                      ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-purple-600'
+                  }`}
+                >
+                  Claims
+                </Link>
                 {user.role === 'admin' && (
                   <Link
                     to="/admin"
@@ -120,6 +131,8 @@ export const Navbar = () => {
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
+
+            {user && <NotificationBell />}
 
             {user ? (
               <div className="flex items-center gap-3 pl-2 border-l border-slate-200 dark:border-slate-800">
@@ -206,6 +219,13 @@ export const Navbar = () => {
                 className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
               >
                 My Reports
+              </Link>
+              <Link
+                to="/claims"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-md text-base font-medium text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/20"
+              >
+                Claims
               </Link>
               <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between px-3">
                 <span className="text-sm font-semibold">{user.name}</span>

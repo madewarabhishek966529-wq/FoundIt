@@ -23,6 +23,7 @@ import { getItemMatches, dismissMatch } from '../api/matches.api';
 import { useAuthStore } from '../store/authStore';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { MatchCard } from '../components/matches/MatchCard';
+import { ClaimModal } from '../components/claims/ClaimModal';
 
 export const ItemDetail = () => {
   const { id } = useParams();
@@ -30,6 +31,8 @@ export const ItemDetail = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [claimModalOpen, setClaimModalOpen] = useState(false);
+  const [activeClaimMatch, setActiveClaimMatch] = useState(null);
 
   // Fetch item details
   const { data: itemData, isLoading: itemLoading, error } = useQuery({
@@ -98,6 +101,23 @@ export const ItemDetail = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-4 space-y-8">
+      {/* Claim Modal */}
+      <ClaimModal
+        isOpen={claimModalOpen}
+        onClose={() => {
+          setClaimModalOpen(false);
+          setActiveClaimMatch(null);
+        }}
+        foundItem={activeClaimMatch ? activeClaimMatch.foundItem : (isFound ? item : null)}
+        lostItemId={activeClaimMatch ? activeClaimMatch.lostItem?._id : (!isFound ? item._id : null)}
+        matchId={activeClaimMatch ? (activeClaimMatch._id || activeClaimMatch.id) : null}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['item', id] });
+          queryClient.invalidateQueries({ queryKey: ['matches', id] });
+          navigate('/claims');
+        }}
+      />
+
       {/* Top Bar */}
       <div className="flex items-center justify-between">
         <button
@@ -266,7 +286,14 @@ export const ItemDetail = () => {
             {isFound && !isOwner && item.status === 'open' && (
               <button
                 type="button"
-                onClick={() => alert('Claim verification modal will be enabled in Phase 3!')}
+                onClick={() => {
+                  if (!user) {
+                    navigate('/login');
+                  } else {
+                    setActiveClaimMatch(null);
+                    setClaimModalOpen(true);
+                  }
+                }}
                 className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
@@ -315,7 +342,10 @@ export const ItemDetail = () => {
                   match={match}
                   currentItemType={item.type}
                   onDismiss={(matchId) => dismissMutation.mutate(matchId)}
-                  onClaim={() => alert('Claim flow will be enabled in Phase 3!')}
+                  onClaim={(m) => {
+                    setActiveClaimMatch(m);
+                    setClaimModalOpen(true);
+                  }}
                 />
               ))}
             </div>

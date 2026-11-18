@@ -10,10 +10,14 @@ import { ReportLost } from './pages/ReportLost';
 import { ReportFound } from './pages/ReportFound';
 import { ItemDetail } from './pages/ItemDetail';
 import { MyItems } from './pages/MyItems';
+import { Claims } from './pages/Claims';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { useAuthStore } from './store/authStore';
+import { useSocket } from './hooks/useSocket';
 
 export function App() {
   const theme = useAuthStore((state) => state.theme);
+  useSocket(); // Maintain live socket events
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -55,6 +59,22 @@ export function App() {
           element={
             <ProtectedRoute>
               <MyItems />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="claims"
+          element={
+            <ProtectedRoute>
+              <Claims />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin"
+          element={
+            <ProtectedRoute requireRole="admin">
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

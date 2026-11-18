@@ -1,0 +1,100 @@
+[
+  {
+    "category": "phone",
+    "zone": "CS Dept",
+    "lostTitle": "iPhone 13 Midnight Blue",
+    "lostText": "Midnight blue iPhone 13 with matte black silicone case and apple logo",
+    "foundTitle": "Found Dark Blue Apple Phone",
+    "foundText": "Apple smartphone dark blue in black protective bumper case near Lab 2",
+    "distractors": [
+      { "category": "phone", "zone": "Hostel A", "title": "Red Samsung Galaxy S21" },
+      { "category": "phone", "zone": "Library", "title": "White Google Pixel 7" },
+      { "category": "laptop", "zone": "CS Dept", "title": "MacBook Air M2 Space Gray" }
+    ]
+  },
+  {
+    "category": "bottle",
+    "zone": "Library",
+    "lostTitle": "Navy Blue Hydro Flask bottle",
+    "lostText": "Insulated stainless steel water flask in navy blue with stickers on side",
+    "foundTitle": "Found navy water flask with stickers",
+    "foundText": "Navy insulated stainless steel bottle left on 2nd floor library study desk",
+    "distractors": [
+      { "category": "bottle", "zone": "Canteen", "title": "Clear plastic Tupperware bottle" },
+      { "category": "bottle", "zone": "Ground", "title": "Silver Milton steel bottle" },
+      { "category": "bag", "zone": "Library", "title": "Blue gym drawstring bag" }
+    ]
+  },
+  {
+    "category": "earbuds",
+    "zone": "Canteen",
+    "lostTitle": "White AirPods Pro in cartoon case",
+    "lostText": "AirPods Pro 2nd gen in green avocado silicone protective case",
+    "foundTitle": "Wireless earbuds found under canteen bench",
+    "foundText": "Pair of white wireless earbuds inside cute green silicone case",
+    "distractors": [
+      { "category": "earbuds", "zone": "Hostel B", "title": "Black Boat wireless earphones" },
+      { "category": "keys", "zone": "Canteen", "title": "Bike key with green keychain" }
+    ]
+  },
+  {
+    "category": "wallet",
+    "zone": "Admin Block",
+    "lostTitle": "Brown leather trifold wallet",
+    "lostText": "Genuine brown leather wallet with coin pouch and student ID slot",
+    "foundTitle": "Brown leather men wallet",
+    "foundText": "Found brown vintage style trifold leather wallet near cash counter",
+    "distractors": [
+      { "category": "wallet", "zone": "Parking", "title": "Black canvas zipper pouch" },
+      { "category": "id-card", "zone": "Admin Block", "title": "Student ID card in transparent holder" }
+    ]
+  },
+  {
+    "category": "keys",
+    "zone": "Hostel A",
+    "lostTitle": "Room keys with Marvel Iron Man keychain",
+    "lostText": "Set of three silver room keys with heavy metal Iron Man helmet fob",
+    "foundTitle": "Keys with metallic superhero keychain",
+    "foundText": "3 keys found in corridor with red and gold metallic helmet keychain",
+    "distractors": [
+      { "category": "keys", "zone": "Main Gate", "title": "Single bike ignition key" },
+      { "category": "keys", "zone": "Parking", "title": "Honda Activa key on blue lanyard" }
+    ]
+  },
+  {
+    "category": "laptop",
+    "zone": "Mech Dept",
+    "lostTitle": "Dell XPS 15 Silver with carbon fiber palmrest",
+    "lostText": "Silver Dell XPS 15 laptop with black keyboard and small dent on left corner",
+    "foundTitle": "Silver Dell Laptop left in CAD lab",
+    "foundText": "Dell metallic silver laptop with carbon palmrest turned in from Mech Lab 1",
+    "distractors": [
+      { "category": "laptop", "zone": "CS Dept", "title": "HP Pavilion 14 Blue" },
+      { "category": "laptop", "zone": "Library", "title": "Lenovo ThinkPad black" }
+    ]
+  },
+  {
+    "category": "watch",
+    "zone": "Ground",
+    "lostTitle": "Black Amazfit GTS smartwatch",
+    "lostText": "Black rectangular smartwatch with silicone sports strap lost during football",
+    "foundTitle": "Found digital sports watch on turf",
+    "foundText": "Black rectangular fitness tracker watch found near goalpost on ground",
+    "distractors": [
+      { "category": "watch", "zone": "Gym", "title": "Analog Casio metal watch" },
+      { "category": "clothing", "zone": "Ground", "title": "Black sports jersey" }
+    ]
+  },
+  {
+    "category": "glasses",
+    "zone": "Auditorium",
+    "lostTitle": "Ray-Ban tortoise shell spectacles in brown case",
+    "lostText": "Tortoise shell prescription eyeglasses in hard leather Ray-Ban case",
+    "foundTitle": "Spectacles case found on row F",
+    "foundText": "Hard brown spectacle case containing tortoise shell frame glasses",
+    "distractors": [
+      { "category": "glasses", "zone": "Library", "title": "Black wireframe reading glasses" },
+      { "category": "other", "zone": "Auditorium", "title": "Laser pointer" }
+    ]
+  }
+]

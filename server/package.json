@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node scripts/seed.js",
+    "eval": "node scripts/eval-matching.js",
     "test": "node --test test/**/*.test.js"
   },
   "dependencies": {
