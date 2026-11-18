@@ -1,0 +1,16 @@
+{
+  "name": "foundit",
+  "version": "1.0.0",
+  "description": "FoundIt - Campus Lost & Found with Visual Matching",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "start:server": "npm --prefix server start",
+    "build:client": "npm --prefix client run build"
+  },
+  "keywords": ["lost-and-found", "clip", "mern", "vector-search"],
+  "author": "",
+  "license": "ISC"
+}
