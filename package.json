@@ -5,10 +5,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "node scripts/dev.js",
+    "start": "node scripts/dev.js",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
     "start:server": "npm --prefix server start",
-    "build:client": "npm --prefix client run build"
+    "build:client": "npm --prefix client run build",
+    "test": "npm --prefix server test"
   },
   "keywords": ["lost-and-found", "clip", "mern", "vector-search"],
   "author": "",
